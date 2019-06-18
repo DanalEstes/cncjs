@@ -540,14 +540,18 @@ class TinyGController {
                 if ((data === WAIT) && (qr >= this.runner.plannerBufferPoolSize)) {
                     this.feeder.unhold();
                 }
-                if ((data === SYNC) && (qr >= this.runner.plannerBufferPoolSize)) {
-                    this.feeder.unhold();
-                }
             }
             this.feeder.next();
         });
 
         this.runner.on('sr', (sr) => {
+            // Feeder
+            if (this.feeder.state.hold) {
+                const { data } = { ...this.feeder.state.holdReason };
+                if ((data === SYNC) && (sr.stat === 3)) {
+                    this.feeder.unhold();
+                }
+            }
         });
 
         this.runner.on('fb', (fb) => {
