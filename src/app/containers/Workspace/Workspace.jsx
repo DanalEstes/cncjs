@@ -20,16 +20,19 @@ import PrimaryWidgets from './PrimaryWidgets';
 import SecondaryWidgets from './SecondaryWidgets';
 import FeederPaused from './modals/FeederPaused';
 import FeederWait from './modals/FeederWait';
+import FeederSync from './modals/FeederSync';
 import ServerDisconnected from './modals/ServerDisconnected';
 import styles from './index.styl';
 import {
     MODAL_NONE,
     MODAL_FEEDER_PAUSED,
     MODAL_FEEDER_WAIT,
+    MODAL_FEEDER_SYNC,
     MODAL_SERVER_DISCONNECTED
 } from './constants';
 
 const WAIT = '%wait';
+const SYNC = '%sync';
 
 const startWaiting = () => {
     // Adds the 'wait' class to <html>
@@ -145,7 +148,7 @@ class Workspace extends PureComponent {
             const { hold, holdReason } = { ...status };
 
             if (!hold) {
-                if (_.includes([MODAL_FEEDER_PAUSED, MODAL_FEEDER_WAIT], modal.name)) {
+                if (_.includes([MODAL_FEEDER_PAUSED, MODAL_FEEDER_WAIT, MODAL_FEEDER_SYNC], modal.name)) {
                     this.action.closeModal();
                 }
                 return;
@@ -163,6 +166,14 @@ class Workspace extends PureComponent {
             if (data === WAIT) {
                 this.action.openModal(MODAL_FEEDER_WAIT, {
                     title: '%wait'
+                });
+                return;
+            }
+
+
+            if (data === SYNC) {
+                this.action.openModal(MODAL_FEEDER_SYNC, {
+                    title: '%sync'
                 });
                 return;
             }
@@ -438,6 +449,12 @@ class Workspace extends PureComponent {
                 )}
                 {modal.name === MODAL_FEEDER_WAIT && (
                     <FeederWait
+                        title={modal.params.title}
+                        onClose={this.action.closeModal}
+                    />
+                )}
+                {modal.name === MODAL_FEEDER_SYNC && (
+                    <FeederSync
                         title={modal.params.title}
                         onClose={this.action.closeModal}
                     />

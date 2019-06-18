@@ -5,10 +5,12 @@ export const {
     MODAL_NONE,
     MODAL_FEEDER_PAUSED,
     MODAL_FEEDER_WAIT,
+    MODAL_FEEDER_SYNC,
     MODAL_SERVER_DISCONNECTED
 } = constants('containers/Workspace', [
     'MODAL_NONE',
     'MODAL_FEEDER_PAUSED',
     'MODAL_FEEDER_WAIT',
+    'MODAL_FEEDER_SYNC',
     'MODAL_SERVER_DISCONNECTED'
 ]);

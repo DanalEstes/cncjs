@@ -40,6 +40,7 @@ const SENDER_STATUS_ACK = 'ack';
 
 // % commands
 const WAIT = '%wait';
+const SYNC = '%sync';
 
 const log = logger('controller:TinyG');
 const noop = () => {};
@@ -208,6 +209,13 @@ class TinyGController {
                         return 'G4 P0.5'; // dwell
                     }
 
+                    // %sync
+                    if (line === SYNC) {
+                        log.debug('Processing %sync command: Wait for the machine to stop moving');
+                        this.feeder.hold({ data: SYNC }); // Hold reason
+                        return 'G4 P1.0'; // dwell
+                    }
+
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
                     evaluateAssignmentExpression(line.slice(1), context);
@@ -283,6 +291,12 @@ class TinyGController {
                     if (line === WAIT) {
                         log.debug(`Wait for the planner to empty: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.sender.hold({ data: WAIT }); // Hold reason
+                        return 'G4 P0.5'; // dwell
+                    }
+
+                    if (line === SYNC) {
+                        log.debug('Sender processing SYNC: Wait for machine to stop moving.');
+                        this.sender.hold({ data: SYNC }); // Hold reason
                         return 'G4 P0.5'; // dwell
                     }
 
@@ -524,6 +538,9 @@ class TinyGController {
             if (this.feeder.state.hold) {
                 const { data } = { ...this.feeder.state.holdReason };
                 if ((data === WAIT) && (qr >= this.runner.plannerBufferPoolSize)) {
+                    this.feeder.unhold();
+                }
+                if ((data === SYNC) && (qr >= this.runner.plannerBufferPoolSize)) {
                     this.feeder.unhold();
                 }
             }
